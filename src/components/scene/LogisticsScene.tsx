@@ -5,32 +5,66 @@ import { useFrame } from "@react-three/fiber";
 import { Environment, ContactShadows } from "@react-three/drei";
 import * as THREE from "three";
 
-function Truck({ position, rotation = [0, 0, 0] as [number, number, number] }) {
+type Vec3 = [number, number, number];
+
+function Truck({
+  position,
+  rotation = [0, 0, 0],
+}: {
+  position: Vec3;
+  rotation?: Vec3;
+}) {
   return (
     <group position={position} rotation={rotation}>
+      {/* Cabin */}
       <mesh position={[0, 1.2, 1.8]} castShadow>
         <boxGeometry args={[2.2, 1.8, 2.2]} />
         <meshStandardMaterial color="#e11d2e" metalness={0.4} roughness={0.35} />
       </mesh>
+      {/* Body */}
       <mesh position={[0, 1.4, -1.6]} castShadow>
         <boxGeometry args={[2.4, 2.4, 4.8]} />
         <meshStandardMaterial color="#1a1a1a" metalness={0.3} roughness={0.5} />
       </mesh>
-      {[[-1.1, 0.4, 1.5], [1.1, 0.4, 1.5], [-1.1, 0.4, -2.8], [1.1, 0.4, -2.8]].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} rotation={[0, 0, Math.PI / 2]} castShadow>
+      {/* Wheels */}
+      {(
+        [
+          [-1.1, 0.4, 1.5],
+          [1.1, 0.4, 1.5],
+          [-1.1, 0.4, -2.8],
+          [1.1, 0.4, -2.8],
+        ] as Vec3[]
+      ).map((pos, i) => (
+        <mesh
+          key={i}
+          position={pos}
+          rotation={[0, 0, Math.PI / 2]}
+          castShadow
+        >
           <cylinderGeometry args={[0.45, 0.45, 0.35, 16]} />
           <meshStandardMaterial color="#111" metalness={0.6} roughness={0.4} />
         </mesh>
       ))}
+      {/* Red stripe */}
       <mesh position={[0, 1.4, -1.6]}>
         <boxGeometry args={[2.42, 0.25, 4.82]} />
-        <meshStandardMaterial color="#e11d2e" emissive="#e11d2e" emissiveIntensity={0.3} />
+        <meshStandardMaterial
+          color="#e11d2e"
+          emissive="#e11d2e"
+          emissiveIntensity={0.3}
+        />
       </mesh>
     </group>
   );
 }
 
-function Container({ position, color = "#e11d2e" }: { position: [number, number, number]; color?: string }) {
+function Container({
+  position,
+  color = "#e11d2e",
+}: {
+  position: Vec3;
+  color?: string;
+}) {
   return (
     <mesh position={position} castShadow receiveShadow>
       <boxGeometry args={[2.4, 2.6, 6]} />
@@ -39,17 +73,20 @@ function Container({ position, color = "#e11d2e" }: { position: [number, number,
   );
 }
 
-function ReachStacker({ position }: { position: [number, number, number] }) {
+function ReachStacker({ position }: { position: Vec3 }) {
   return (
     <group position={position}>
+      {/* Base */}
       <mesh position={[0, 1.2, 0]} castShadow>
         <boxGeometry args={[3.5, 2.4, 6]} />
         <meshStandardMaterial color="#c41e2a" metalness={0.4} roughness={0.4} />
       </mesh>
+      {/* Arm */}
       <mesh position={[0, 4.5, -1]} rotation={[0.4, 0, 0]} castShadow>
         <boxGeometry args={[0.8, 0.6, 8]} />
         <meshStandardMaterial color="#333" metalness={0.6} roughness={0.3} />
       </mesh>
+      {/* Cab */}
       <mesh position={[0.8, 2.8, 1.5]} castShadow>
         <boxGeometry args={[1.6, 1.6, 1.8]} />
         <meshStandardMaterial color="#222" metalness={0.3} roughness={0.5} />
@@ -58,19 +95,26 @@ function ReachStacker({ position }: { position: [number, number, number] }) {
   );
 }
 
-function Freighter({ position }: { position: [number, number, number] }) {
+function Freighter({ position }: { position: Vec3 }) {
   return (
     <group position={position}>
+      {/* Hull */}
       <mesh position={[0, 0, 0]} castShadow>
         <boxGeometry args={[8, 3, 28]} />
         <meshStandardMaterial color="#1e293b" metalness={0.5} roughness={0.4} />
       </mesh>
+      {/* Bridge */}
       <mesh position={[0, 4, 10]} castShadow>
         <boxGeometry args={[5, 5, 4]} />
         <meshStandardMaterial color="#334155" metalness={0.4} roughness={0.4} />
       </mesh>
-      {[-8, -2, 4].map((z, i) => (
-        <Container key={i} position={[0, 2.9, z]} color={i % 2 === 0 ? "#e11d2e" : "#f8f8f8"} />
+      {/* Containers on deck */}
+      {([-8, -2, 4] as const).map((z, i) => (
+        <Container
+          key={i}
+          position={[0, 2.9, z]}
+          color={i % 2 === 0 ? "#e11d2e" : "#f8f8f8"}
+        />
       ))}
     </group>
   );
@@ -85,7 +129,11 @@ function Ground() {
   );
 }
 
-export default function LogisticsScene({ scrollProgress }: { scrollProgress: number }) {
+export default function LogisticsScene({
+  scrollProgress,
+}: {
+  scrollProgress: number;
+}) {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame(() => {
@@ -112,19 +160,23 @@ export default function LogisticsScene({ scrollProgress }: { scrollProgress: num
 
       <Ground />
 
+      {/* Starting zone — warehouse / loading */}
       <ReachStacker position={[-8, 0, 40]} />
       <Truck position={[2, 0, 38]} rotation={[0, -0.3, 0]} />
       <Container position={[-3, 1.3, 32]} />
       <Container position={[5, 1.3, 28]} color="#f8f8f8" />
 
+      {/* Road stretch */}
       <Truck position={[-4, 0, 10]} rotation={[0, 0.1, 0]} />
       <Truck position={[6, 0, -5]} rotation={[0, -0.15, 0]} />
 
+      {/* Port / quay */}
       <mesh position={[0, 0.1, -40]} receiveShadow>
         <boxGeometry args={[60, 0.3, 30]} />
         <meshStandardMaterial color="#1a1a1a" />
       </mesh>
 
+      {/* Containers at port */}
       {Array.from({ length: 8 }).map((_, i) => (
         <Container
           key={i}
@@ -133,12 +185,15 @@ export default function LogisticsScene({ scrollProgress }: { scrollProgress: num
         />
       ))}
 
+      {/* Ship */}
       <Freighter position={[0, 1.5, -70]} />
 
+      {/* Distant second ship */}
       <group position={[25, 3, -110]} scale={0.7}>
         <Freighter position={[0, 0, 0]} />
       </group>
 
+      {/* Fog-like atmosphere */}
       <fog attach="fog" args={["#0a0a0a", 40, 160]} />
 
       <ContactShadows
