@@ -42,7 +42,7 @@ function RealReachTruck({
   rotation?: Vec3;
   scale?: number;
 }) {
-  const { scene } = useGLTF("/models/reach-truck.glb");
+  const { scene } = useGLTF("/models/electric-reach-truck-1-6-t-moving-mast.glb");
   const cloned = scene.clone();
 
   return (
@@ -66,7 +66,7 @@ function RealShip({
   rotation?: Vec3;
   scale?: number;
 }) {
-  const { scene } = useGLTF("/models/container-ship.glb");
+  const { scene } = useGLTF("/models/container-ship-loaded.glb");
   const cloned = scene.clone();
 
   return (
@@ -289,5 +289,5 @@ export default function LogisticsScene({
 
 // Preload models
 useGLTF.preload("/models/shipping-container.glb");
-useGLTF.preload("/models/reach-truck.glb");
-useGLTF.preload("/models/container-ship.glb");
+useGLTF.preload("/models/electric-reach-truck-1-6-t-moving-mast.glb");
+useGLTF.preload("/models/container-ship-loaded.glb");
