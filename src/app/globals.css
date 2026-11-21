@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --wwk-red: #e11d2e;
+  --wwk-red-dark: #b01522;
+  --wwk-white: #f8f8f8;
+  --wwk-black: #0a0a0a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  background: var(--wwk-black);
+  color: var(--wwk-white);
+  overflow-x: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.overlay-text {
+  text-shadow: 0 4px 30px rgba(0,0,0,0.85);
+  letter-spacing: -0.02em;
+}
+
+.red-glow {
+  text-shadow: 0 0 40px rgba(225, 29, 46, 0.6);
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--wwk-red), #ff4d5e);
+  z-index: 100;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.lang-btn {
+  transition: all 0.2s ease;
+}
+.lang-btn.active {
+  background: var(--wwk-red);
+  color: white;
+}
