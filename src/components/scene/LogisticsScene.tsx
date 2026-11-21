@@ -7,11 +7,9 @@ import * as THREE from "three";
 
 type Vec3 = [number, number, number];
 
-/* -------------------- REAL MODELS -------------------- */
-
 function RealContainer({
   position,
-  rotation = [0, 0, 0],
+  rotation = [0, 0, 0] as Vec3,
   scale = 1,
 }: {
   position: Vec3;
@@ -19,23 +17,20 @@ function RealContainer({
   scale?: number;
 }) {
   const { scene } = useGLTF("/models/shipping-container.glb");
-  const cloned = scene.clone();
-
+  const cloned = useRef(scene.clone(true)).current;
   return (
     <primitive
       object={cloned}
       position={position}
       rotation={rotation}
       scale={scale}
-      castShadow
-      receiveShadow
     />
   );
 }
 
 function RealReachTruck({
   position,
-  rotation = [0, 0, 0],
+  rotation = [0, 0, 0] as Vec3,
   scale = 1,
 }: {
   position: Vec3;
@@ -43,23 +38,20 @@ function RealReachTruck({
   scale?: number;
 }) {
   const { scene } = useGLTF("/models/electric-reach-truck-1-6-t-moving-mast.glb");
-  const cloned = scene.clone();
-
+  const cloned = useRef(scene.clone(true)).current;
   return (
     <primitive
       object={cloned}
       position={position}
       rotation={rotation}
       scale={scale}
-      castShadow
-      receiveShadow
     />
   );
 }
 
 function RealShip({
   position,
-  rotation = [0, 0, 0],
+  rotation = [0, 0, 0] as Vec3,
   scale = 1,
 }: {
   position: Vec3;
@@ -67,227 +59,187 @@ function RealShip({
   scale?: number;
 }) {
   const { scene } = useGLTF("/models/container-ship-loaded.glb");
-  const cloned = scene.clone();
-
+  const cloned = useRef(scene.clone(true)).current;
   return (
     <primitive
       object={cloned}
       position={position}
       rotation={rotation}
       scale={scale}
-      castShadow
-      receiveShadow
     />
   );
 }
 
-/* -------------------- PROCEDURAL TRUCK (fallback + detail) -------------------- */
 function Truck({
   position,
-  rotation = [0, 0, 0],
+  rotation = [0, 0, 0] as Vec3,
   moving = false,
 }: {
   position: Vec3;
   rotation?: Vec3;
   moving?: boolean;
 }) {
+  const group = useRef<THREE.Group>(null);
   const wheels = useRef<THREE.Group>(null);
 
   useFrame((_, delta) => {
     if (moving && wheels.current) {
-      wheels.current.rotation.x -= delta * 5;
+      wheels.current.rotation.x -= delta * 6;
     }
   });
 
   return (
-    <group position={position} rotation={rotation}>
-      <mesh position={[0, 0.55, 0]} castShadow>
-        <boxGeometry args={[2.4, 0.35, 7.2]} />
-        <meshStandardMaterial color="#1a1a1a" metalness={0.6} roughness={0.4} />
+    <group ref={group} position={position} rotation={rotation}>
+      <mesh position={[0, 0.5, 0]} castShadow>
+        <boxGeometry args={[2.3, 0.3, 6.8]} />
+        <meshStandardMaterial color="#111" metalness={0.7} roughness={0.35} />
       </mesh>
-      <mesh position={[0, 1.55, 2.4]} castShadow>
-        <boxGeometry args={[2.35, 1.7, 2.1]} />
-        <meshStandardMaterial color="#e11d2e" metalness={0.35} roughness={0.3} />
+      <mesh position={[0, 1.45, 2.3]} castShadow>
+        <boxGeometry args={[2.25, 1.55, 2]} />
+        <meshStandardMaterial color="#e11d2e" metalness={0.4} roughness={0.3} />
       </mesh>
-      <mesh position={[0, 2.45, 2.4]} castShadow>
-        <boxGeometry args={[2.4, 0.15, 2.15]} />
-        <meshStandardMaterial color="#b01522" metalness={0.4} roughness={0.35} />
+      <mesh position={[0, 2.3, 2.3]} castShadow>
+        <boxGeometry args={[2.3, 0.12, 2.05]} />
+        <meshStandardMaterial color="#9f1239" metalness={0.45} roughness={0.3} />
       </mesh>
-      <mesh position={[0, 1.75, 3.45]}>
-        <boxGeometry args={[2.1, 1.1, 0.08]} />
-        <meshStandardMaterial
-          color="#87ceeb"
-          transparent
-          opacity={0.35}
-          metalness={0.9}
-          roughness={0.1}
-        />
+      <mesh position={[0, 1.65, 3.32]}>
+        <boxGeometry args={[2.05, 1, 0.06]} />
+        <meshStandardMaterial color="#7dd3fc" transparent opacity={0.3} metalness={0.95} roughness={0.05} />
       </mesh>
-      <mesh position={[0, 1.7, -1.6]} castShadow>
-        <boxGeometry args={[2.45, 2.7, 5.4]} />
-        <meshStandardMaterial color="#f1f5f9" metalness={0.25} roughness={0.55} />
+      <mesh position={[0, 1.55, -1.5]} castShadow>
+        <boxGeometry args={[2.35, 2.5, 5]} />
+        <meshStandardMaterial color="#f1f5f9" metalness={0.25} roughness={0.5} />
       </mesh>
-      <mesh position={[0, 2.2, -1.6]}>
-        <boxGeometry args={[2.47, 0.35, 5.42]} />
-        <meshStandardMaterial
-          color="#e11d2e"
-          emissive="#e11d2e"
-          emissiveIntensity={0.25}
-        />
+      <mesh position={[0, 2.05, -1.5]}>
+        <boxGeometry args={[2.37, 0.3, 5.02]} />
+        <meshStandardMaterial color="#e11d2e" emissive="#e11d2e" emissiveIntensity={0.35} />
       </mesh>
       <group ref={wheels}>
         {[
-          [-1.05, 0.42, 2.6],
-          [1.05, 0.42, 2.6],
-          [-1.05, 0.42, 1.1],
-          [1.05, 0.42, 1.1],
-          [-1.05, 0.42, -2.4],
-          [1.05, 0.42, -2.4],
-          [-1.05, 0.42, -3.6],
-          [1.05, 0.42, -3.6],
-        ].map((pos, i) => (
-          <group key={i} position={pos as Vec3}>
+          [-1, 0.4, 2.4], [1, 0.4, 2.4],
+          [-1, 0.4, 1.0], [1, 0.4, 1.0],
+          [-1, 0.4, -2.2], [1, 0.4, -2.2],
+          [-1, 0.4, -3.4], [1, 0.4, -3.4],
+        ].map((p, i) => (
+          <group key={i} position={p as Vec3}>
             <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
-              <cylinderGeometry args={[0.48, 0.48, 0.38, 18]} />
-              <meshStandardMaterial color="#111" metalness={0.7} roughness={0.35} />
+              <cylinderGeometry args={[0.45, 0.45, 0.35, 16]} />
+              <meshStandardMaterial color="#0a0a0a" metalness={0.6} roughness={0.4} />
             </mesh>
             <mesh rotation={[0, 0, Math.PI / 2]}>
-              <cylinderGeometry args={[0.28, 0.28, 0.4, 12]} />
-              <meshStandardMaterial color="#444" metalness={0.8} roughness={0.25} />
+              <cylinderGeometry args={[0.25, 0.25, 0.37, 12]} />
+              <meshStandardMaterial color="#3f3f46" metalness={0.85} roughness={0.2} />
             </mesh>
           </group>
         ))}
       </group>
-      <mesh position={[-0.7, 1.15, 3.5]}>
-        <boxGeometry args={[0.35, 0.22, 0.12]} />
-        <meshStandardMaterial color="#fff7ed" emissive="#fff7ed" emissiveIntensity={1.2} />
+      <mesh position={[-0.65, 1.05, 3.35]}>
+        <boxGeometry args={[0.32, 0.18, 0.1]} />
+        <meshStandardMaterial color="#fff7ed" emissive="#fff7ed" emissiveIntensity={2} />
       </mesh>
-      <mesh position={[0.7, 1.15, 3.5]}>
-        <boxGeometry args={[0.35, 0.22, 0.12]} />
-        <meshStandardMaterial color="#fff7ed" emissive="#fff7ed" emissiveIntensity={1.2} />
+      <mesh position={[0.65, 1.05, 3.35]}>
+        <boxGeometry args={[0.32, 0.18, 0.1]} />
+        <meshStandardMaterial color="#fff7ed" emissive="#fff7ed" emissiveIntensity={2} />
       </mesh>
     </group>
   );
 }
 
-/* -------------------- ENVIRONMENT -------------------- */
 function EnvironmentBase() {
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[260, 480]} />
-        <meshStandardMaterial color="#0c0c0c" metalness={0.05} roughness={0.95} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+        <planeGeometry args={[300, 500]} />
+        <meshStandardMaterial color="#0a0a0a" roughness={0.95} metalness={0.05} />
       </mesh>
-
-      {/* Road */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 20]} receiveShadow>
-        <planeGeometry args={[16, 110]} />
-        <meshStandardMaterial color="#1a1a1a" metalness={0.1} roughness={0.85} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 25]} receiveShadow>
+        <planeGeometry args={[18, 130]} />
+        <meshStandardMaterial color="#171717" roughness={0.85} />
       </mesh>
-
-      {Array.from({ length: 22 }).map((_, i) => (
-        <mesh
-          key={i}
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[0, 0.03, 55 - i * 5]}
-        >
-          <planeGeometry args={[0.28, 2.4]} />
-          <meshStandardMaterial color="#f8fafc" />
+      {Array.from({ length: 26 }).map((_, i) => (
+        <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 70 - i * 5.5]}>
+          <planeGeometry args={[0.3, 2.6]} />
+          <meshStandardMaterial color="#e2e8f0" />
         </mesh>
       ))}
-
-      {/* Quay */}
-      <mesh position={[0, 0.18, -48]} receiveShadow>
-        <boxGeometry args={[90, 0.45, 36]} />
-        <meshStandardMaterial color="#141414" metalness={0.15} roughness={0.8} />
+      <mesh position={[0, 0.2, -55]} receiveShadow>
+        <boxGeometry args={[100, 0.5, 45]} />
+        <meshStandardMaterial color="#111" roughness={0.8} />
       </mesh>
-      <mesh position={[0, 0.5, -30]} receiveShadow>
-        <boxGeometry args={[90, 0.7, 1.4]} />
-        <meshStandardMaterial color="#222" metalness={0.2} roughness={0.7} />
+      <mesh position={[0, 0.55, -32]} receiveShadow>
+        <boxGeometry args={[100, 0.7, 1.6]} />
+        <meshStandardMaterial color="#1f1f1f" />
       </mesh>
     </group>
   );
 }
 
-/* -------------------- MAIN SCENE -------------------- */
-export default function LogisticsScene({
-  scrollProgress,
-}: {
-  scrollProgress: number;
-}) {
+export default function LogisticsScene({ scrollProgress }: { scrollProgress: number }) {
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame(() => {
-    if (!groupRef.current) return;
-    groupRef.current.rotation.y = Math.sin(Date.now() * 0.0001) * 0.012;
+    if (groupRef.current) {
+      groupRef.current.rotation.y = Math.sin(Date.now() * 0.00008) * 0.008;
+    }
   });
 
   return (
     <group ref={groupRef}>
-      <ambientLight intensity={0.28} />
+      <ambientLight intensity={0.35} />
       <directionalLight
-        position={[30, 50, 18]}
-        intensity={1.55}
+        position={[40, 60, 25]}
+        intensity={1.8}
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={140}
-        shadow-camera-left={-60}
-        shadow-camera-right={60}
-        shadow-camera-top={60}
-        shadow-camera-bottom={-60}
+        shadow-camera-far={200}
+        shadow-camera-left={-80}
+        shadow-camera-right={80}
+        shadow-camera-top={80}
+        shadow-camera-bottom={-80}
       />
-      <pointLight position={[-20, 14, -30]} intensity={0.75} color="#e11d2e" />
-      <pointLight position={[22, 12, 30]} intensity={0.5} color="#ffffff" />
-      <hemisphereLight args={["#1e293b", "#050505", 0.4]} />
+      <pointLight position={[-25, 18, -40]} intensity={1.1} color="#e11d2e" distance={80} />
+      <pointLight position={[30, 15, 40]} intensity={0.6} color="#ffffff" distance={60} />
+      <hemisphereLight args={["#1e293b", "#050505", 0.45]} />
 
       <EnvironmentBase />
 
       <Suspense fallback={null}>
-        {/* Loading zone — real reach truck + containers */}
-        <RealReachTruck position={[-10, 0, 48]} rotation={[0, 0.4, 0]} scale={1.15} />
-        <RealContainer position={[-3, 0, 38]} scale={1} />
-        <RealContainer position={[5.5, 0, 34]} rotation={[0, 0.1, 0]} scale={1} />
-        <RealContainer position={[-6, 0, 30]} scale={1} />
+        <RealReachTruck position={[-12, 0, 58]} rotation={[0, 0.6, 0]} scale={2.2} />
+        <RealContainer position={[-4, 0, 48]} scale={1.8} />
+        <RealContainer position={[6, 0, 44]} rotation={[0, 0.15, 0]} scale={1.8} />
+        <RealContainer position={[-7, 0, 40]} scale={1.8} />
 
-        {/* Road trucks (procedural for now) */}
-        <Truck position={[-4, 0, 18]} rotation={[0, 0.06, 0]} moving />
-        <Truck position={[5, 0, 2]} rotation={[0, -0.1, 0]} moving />
-        <Truck position={[-2.5, 0, -14]} rotation={[0, 0.04, 0]} moving />
+        <Truck position={[-5, 0, 28]} rotation={[0, 0.08, 0]} moving />
+        <Truck position={[6, 0, 12]} rotation={[0, -0.12, 0]} moving />
+        <Truck position={[-3, 0, -5]} rotation={[0, 0.05, 0]} moving />
+        <Truck position={[4.5, 0, -22]} rotation={[0, -0.08, 0]} moving />
 
-        {/* Port containers */}
-        {Array.from({ length: 10 }).map((_, i) => (
+        {Array.from({ length: 12 }).map((_, i) => (
           <RealContainer
             key={i}
             position={[
-              (i % 5) * 3.4 - 6.8,
+              (i % 4) * 5.5 - 8,
               0,
-              -38 - Math.floor(i / 5) * 7.2,
+              -42 - Math.floor(i / 4) * 9,
             ]}
-            scale={1}
+            scale={1.7}
           />
         ))}
 
-        {/* Real container ship */}
-        <RealShip position={[0, 0, -85]} rotation={[0, Math.PI / 2, 0]} scale={0.38} />
-        <RealShip position={[35, 0, -130]} rotation={[0, Math.PI / 2 + 0.15, 0]} scale={0.28} />
+        <RealShip
+          position={[0, -2, -95]}
+          rotation={[0, Math.PI / 2, 0]}
+          scale={0.22}
+        />
       </Suspense>
 
-      <fog attach="fog" args={["#080808", 30, 160]} />
-
-      <ContactShadows
-        position={[0, 0.01, 0]}
-        opacity={0.65}
-        scale={160}
-        blur={3}
-        far={40}
-      />
-
+      <fog attach="fog" args={["#070707", 25, 140]} />
+      <ContactShadows position={[0, 0.02, 0]} opacity={0.7} scale={180} blur={2.5} far={50} />
       <Environment preset="city" />
     </group>
   );
 }
 
-// Preload models
 useGLTF.preload("/models/shipping-container.glb");
 useGLTF.preload("/models/electric-reach-truck-1-6-t-moving-mast.glb");
 useGLTF.preload("/models/container-ship-loaded.glb");
